@@ -9,5 +9,8 @@
   "author": "",
   "license": "ISC",
   "keywords": [],
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "@hapi/hapi": "^21.3.12"
+  }
 }
