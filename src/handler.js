@@ -54,17 +54,33 @@ const addBookHandler = (request, h) => {
 
 };
 
-const getAllBooksHandler = (request, h) => ({
+const getAllBooksHandler = (request, h) => 
+{ 
+  let filtered = books;
+  if (request.query.name) {
+    filtered = filtered.filter((book) => book.name.toLowerCase().includes(request.query.name.toLowerCase()));
+  }
+  if (request.query.reading) {
+    filtered = filtered.filter((book) => book.reading === request.query.reading);
+    }
+  if (request.query.finished !== undefined){
+    filtered = filtered.filter((book) => (request.query.finished === '1')===(book.readPage === book.pageCount))
+  }
+  const response = h.response({
     status: 'success',
     data: {
-      books,
+      books: filtered.map(({ id, name, publisher }) =>({ id, name, publisher })
+    ),
     },
   });
+  response.code(200);
+  return response;
+};
 
   const getBookByIdHandler = (request, h) => {
     const { bookId } = request.params;
 
-    const book = books.filter((n) => n.id === id)[0];
+    const book = books.filter((n) => n.id === bookId)[0];
     if (book !== undefined) {
         return {
           status: 'success',
@@ -87,8 +103,26 @@ const getAllBooksHandler = (request, h) => ({
        
         const {name, year, author, summary, publisher, pageCount, readPage, reading } = request.payload;
         const updatedAt = new Date().toISOString();
+
+        if (!name) {
+          const response = h.response({ 
+            status: 'fail',
+            message: 'Gagal memperbarui buku. Mohon isi nama buku',
+          });
+          response.code(400);
+          return response;
+        }
+
+        if (readPage > pageCount) {
+          const response = h.response({ 
+            status: 'fail',
+            message: 'Gagal memperbarui buku. readPage tidak boleh lebih besar dari pageCount',
+          });
+          response.code(400);
+          return response;
+        }
        
-        const index = books.findIndex((book) => book.id === id);
+        const index = books.findIndex((book) => book.id === bookId);
        
         if (index !== -1) {
             books[index] = {
