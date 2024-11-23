@@ -31,7 +31,6 @@ const addBookHandler = (request, h) => {
       }
      
       books.push(newBook);
-    
       const isSuccess = books.filter((book) => book.id === id).length > 0;
       if (isSuccess) {
         const response = h.response({
@@ -127,7 +126,7 @@ const getAllBooksHandler = (request, h) =>
         if (index !== -1) {
             books[index] = {
             ...books[index],
-            name, year, author, summary, publisher, pageCount, readPage, reading
+            name, year, author, summary, publisher, pageCount, readPage, reading, updatedAt,
           };
        
           const response = h.response({
