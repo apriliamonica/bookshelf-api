@@ -9,7 +9,7 @@ const addBookHandler = (request, h) => {
     const updatedAt = insertedAt;
 
     const newBook = {
-        name, year, author, summary, publisher, pageCount, readPage, finished, reading, insertedAt, updatedAt,
+        id, name, year, author, summary, publisher, pageCount, readPage, finished, reading, insertedAt, updatedAt,
       };
 
       if (!name) {
@@ -60,7 +60,7 @@ const getAllBooksHandler = (request, h) =>
     filtered = filtered.filter((book) => book.name.toLowerCase().includes(request.query.name.toLowerCase()));
   }
   if (request.query.reading) {
-    filtered = filtered.filter((book) => book.reading === request.query.reading);
+    filtered = filtered.filter((book) => book.reading === (request.query.reading === '1'));
     }
   if (request.query.finished !== undefined){
     filtered = filtered.filter((book) => (request.query.finished === '1')===(book.readPage === book.pageCount))
@@ -147,7 +147,7 @@ const getAllBooksHandler = (request, h) =>
 
 
       const deleteBookByIdHandler = (request, h) => {
-        const { id } = request.params;
+        const { bookId: id } = request.params;
        
         const index = books.findIndex((book) => book.id === id);
        
