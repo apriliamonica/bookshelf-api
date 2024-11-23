@@ -4,14 +4,33 @@ const books = require('./books');
 const addBookHandler = (request, h) => {
     const { name, year, author, summary, publisher, pageCount, readPage, reading} = request.payload;
     const id = nanoid(16);
-    const createdAt = new Date().toISOString();
-    const updatedAt = createdAt;
+    const insertedAt = new Date().toISOString();
+    const finished = pageCount === readPage;
+    const updatedAt = insertedAt;
 
     const newBook = {
-        name, year, author, summary, publisher, pageCount, readPage, reading,
+        name, year, author, summary, publisher, pageCount, readPage, finished, reading, insertedAt, updatedAt,
       };
+
+      if (!name) {
+        const response = h.response({
+          status: 'fail',
+          message: 'Gagal menambahkan buku. Mohon isi nama buku',
+        });
+        response.code(400);
+        return response;
+      }
+
+      if (readPage > pageCount) {
+        const response = h.response({
+          status: 'fail',
+          message: 'Gagal menambahkan buku. readPage tidak boleh lebih besar dari pageCount',
+        });
+        response.code(400);
+        return response;
+      }
      
-      notes.push(newBook);
+      books.push(newBook);
     
       const isSuccess = books.filter((book) => book.id === id).length > 0;
       if (isSuccess) {
@@ -19,7 +38,7 @@ const addBookHandler = (request, h) => {
           status: 'success',
           message: 'Buku berhasil ditambahkan',
           data: {
-            noteId: id,
+            bookId: id,
           },
         });
         response.code(201);
@@ -30,12 +49,12 @@ const addBookHandler = (request, h) => {
         status: 'fail',
         message: 'Buku gagal ditambahkan',
       });
-      response.code(500);
+      response.code(400);
       return response;
 
 };
 
-const getAllBooksHandler = () => ({
+const getAllBooksHandler = (request, h) => ({
     status: 'success',
     data: {
       books,
@@ -43,7 +62,7 @@ const getAllBooksHandler = () => ({
   });
 
   const getBookByIdHandler = (request, h) => {
-    const { id } = request.params;
+    const { bookId } = request.params;
 
     const book = books.filter((n) => n.id === id)[0];
     if (book !== undefined) {
